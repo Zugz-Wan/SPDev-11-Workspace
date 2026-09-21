@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('facility_id')->constrained()->cascadeOnDelete();
+            $table->string('kategori');
             $table->text('deskripsi');
             $table->string('foto')->nullable();
-            $table->enum('status', ['menunggu', 'diproses', 'selesai'])->default('menunggu');
+            $table->enum('status', ['baru', 'diproses', 'selesai', 'ditolak'])->default('baru');
+            $table->text('catatan')->nullable();
             $table->timestamps();
         });
     }
