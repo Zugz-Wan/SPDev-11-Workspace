@@ -8,7 +8,7 @@ class Reservation extends Model
 {
     protected $fillable = [
         'user_id', 'facility_id', 'tanggal', 'start_time',
-        'end_time', 'keperluan', 'status', 'catatan_petugas'
+        'end_time', 'keperluan', 'status', 'catatan_petugas',
     ];
 
     public function user()
