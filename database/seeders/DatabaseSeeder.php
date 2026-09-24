@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Facility;
 use App\Models\Report;
 use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -133,5 +134,9 @@ class DatabaseSeeder extends Seeder
                 'catatan' => 'Kabel HDMI dan adaptor daya telah diganti baru. Proyektor berfungsi normal kembali.',
             ]
         );
+        $this->call([
+            AdminSeeder::class,
+            FacilitySeeder::class,
+        ]);
     }
 }
