@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Report;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -76,11 +75,11 @@ class PetugasReservationController extends Controller
             if ($conflict) {
                 if ($request->expectsJson() && ! $request->acceptsHtml()) {
                     return response()->json([
-                        'message' => 'Gagal menyetujui: Jadwal bentrok dengan reservasi lain yang sudah disetujui pada fasilitas yang sama.',
+                        'message' => 'Jadwal reservasi bentrok dengan reservasi lain yang sudah disetujui.',
                     ], 422);
                 }
 
-                return back()->with('error', 'Gagal menyetujui: Jadwal bentrok dengan reservasi lain yang sudah disetujui pada fasilitas dan jam yang sama.');
+                return back()->with('error', 'Jadwal reservasi bentrok dengan reservasi lain yang sudah disetujui.');
             }
 
             $reservation->update([

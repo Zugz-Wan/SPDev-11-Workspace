@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Antrian Persetujuan Reservasi</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Antrian Reservasi Fasilitas</h1>
             <p class="text-xs sm:text-sm text-slate-500 mt-1">
                 Verifikasi, setujui, tolak, atau batalkan jadwal reservasi fasilitas kampus.
             </p>
@@ -18,7 +18,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
             <div>
-                <p class="text-xs font-medium text-slate-500">Menunggu Persetujuan</p>
+                <p class="text-xs font-medium text-slate-500">Reservasi Pending</p>
                 <p class="text-2xl font-bold text-amber-600 mt-1">{{ $pendingCount }}</p>
             </div>
             <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">

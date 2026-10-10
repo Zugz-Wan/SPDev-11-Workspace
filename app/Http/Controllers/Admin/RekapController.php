@@ -253,7 +253,6 @@ class RekapController extends Controller
         }, 200, $headers);
     }
 
-
     /**
      * Hitung dataset rekapitulasi okupansi dan frekuensi kerusakan.
      *

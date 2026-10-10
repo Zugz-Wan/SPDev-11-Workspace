@@ -47,8 +47,26 @@ class ReservationController extends Controller
             return response()->json($reservation, 201);
         }
 
-        return redirect()->route('reservations.index')
+        return redirect()->route('reservations.my')
             ->with('success', 'Pengajuan reservasi berhasil dikirim! Menunggu persetujuan dari Petugas Fasilitas.');
+    }
+
+    /**
+     * Tampilkan detail reservasi.
+     */
+    public function show(Request $request, $id)
+    {
+        $reservation = Reservation::with(['facility', 'user'])->findOrFail($id);
+
+        if (! auth()->user()->isAdmin() && ! auth()->user()->isPetugas() && $reservation->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($request->expectsJson() && ! $request->acceptsHtml()) {
+            return response()->json($reservation);
+        }
+
+        return view('reservations.show', compact('reservation'));
     }
 
     /**
@@ -57,6 +75,16 @@ class ReservationController extends Controller
     public function destroy(Request $request, $id)
     {
         $reservation = Reservation::where('user_id', auth()->id())->findOrFail($id);
+
+        if (! $reservation->canBeCancelled()) {
+            $hours = (int) config('app.reservation_cancellation_hours', Reservation::CANCELLATION_MIN_HOURS_BEFORE);
+            $msg = "Reservasi tidak dapat dibatalkan karena waktu mulai kurang dari {$hours} jam dari sekarang atau sudah lewat.";
+            if ($request->wantsJson() || ($request->expectsJson() && ! $request->acceptsHtml())) {
+                return response()->json(['message' => $msg], 422);
+            }
+
+            return back()->with('error', $msg);
+        }
 
         if ($reservation->status === 'dibatalkan' || $reservation->status === 'ditolak') {
             if ($request->expectsJson() && ! $request->acceptsHtml()) {

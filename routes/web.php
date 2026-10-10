@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\RecapController;
+use App\Http\Controllers\Admin\RekapController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FacilityController;
@@ -57,7 +58,9 @@ Route::middleware(['auth'])->group(function () {
 // User Reservations Routes
 Route::middleware(['auth'])->group(function () {
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
-    Route::get('/my-reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/my-reservations', [ReservationController::class, 'index'])->name('reservations.my');
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservations.show');
     Route::delete('/reservations/{id}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 });
 
@@ -86,7 +89,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('/users/{id}/verify', [UserController::class, 'verify'])->name('users.verify');
     Route::delete('/users/{id}/reject', [UserController::class, 'reject'])->name('users.reject');
 
-    // Recap & Export
+    // Rekapitulasi & Export
+    Route::get('/rekap', [RekapController::class, 'index'])->name('rekap.index');
+    Route::get('/rekap/export/csv', [RekapController::class, 'exportCsv'])->name('rekap.export.csv');
+    Route::get('/rekap/print', [RekapController::class, 'print'])->name('rekap.print');
     Route::get('/recap', [RecapController::class, 'index'])->name('recap.index');
     Route::get('/recap/export', [RecapController::class, 'exportCsv'])->name('recap.export');
 });

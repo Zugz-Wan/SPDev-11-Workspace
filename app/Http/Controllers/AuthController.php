@@ -32,7 +32,7 @@ class AuthController extends Controller
             'status_akun' => 'pending',
         ]);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil! Akun Anda telah dibuat dan menunggu verifikasi dari Administrator sebelum dapat digunakan untuk login.');
+        return redirect()->route('login')->with('success', 'Registrasi berhasil, akun menunggu verifikasi admin.');
     }
 
     public function showLogin(): View
@@ -57,7 +57,7 @@ class AuthController extends Controller
                 $request->session()->regenerateToken();
 
                 return back()->withErrors([
-                    'email' => 'Akun Anda berhasil terdaftar namun masih menunggu verifikasi oleh Administrator sebelum dapat login.',
+                    'email' => 'Akun Anda belum diverifikasi admin',
                 ])->onlyInput('email');
             }
 
@@ -67,7 +67,7 @@ class AuthController extends Controller
                 $request->session()->regenerateToken();
 
                 return back()->withErrors([
-                    'email' => 'Registrasi akun Anda ditolak oleh Administrator.',
+                    'email' => 'Registrasi akun Anda ditolak',
                 ])->onlyInput('email');
             }
 
