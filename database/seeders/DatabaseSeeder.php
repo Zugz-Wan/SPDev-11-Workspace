@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Facility;
 use App\Models\Report;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,11 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Seed Demo Users
+        // 1. Seed Core Accounts (@kampus.test)
         $pengguna = User::updateOrCreate(
-            ['email' => 'user@example.com'],
+            ['email' => 'user@kampus.test'],
             [
-                'name' => 'Ahmad Pengguna',
+                'name' => 'Pengguna Biasa',
                 'password' => Hash::make('password'),
                 'role' => 'pengguna',
                 'status_akun' => 'terverifikasi',
@@ -28,9 +27,9 @@ class DatabaseSeeder extends Seeder
         );
 
         $petugas = User::updateOrCreate(
-            ['email' => 'petugas@example.com'],
+            ['email' => 'petugas@kampus.test'],
             [
-                'name' => 'Budi Petugas Fasilitas',
+                'name' => 'Petugas Fasilitas',
                 'password' => Hash::make('password'),
                 'role' => 'petugas',
                 'status_akun' => 'terverifikasi',
@@ -38,9 +37,9 @@ class DatabaseSeeder extends Seeder
         );
 
         $admin = User::updateOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => 'admin@kampus.test'],
             [
-                'name' => 'Super Administrator',
+                'name' => 'Admin Kampus',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'status_akun' => 'terverifikasi',
@@ -48,95 +47,59 @@ class DatabaseSeeder extends Seeder
         );
 
         // 2. Seed Facilities
-        $f1 = Facility::updateOrCreate(
-            ['nama' => 'Ruang Rapat VIP'],
-            [
-                'tipe' => 'ruangan',
-                'kapasitas' => 20,
-                'lokasi' => 'Gedung Rektorat Lt. 2',
-                'status' => 'tersedia',
-                'deskripsi' => 'Ruang rapat ber-AC dengan smart screen, sound system, dan meja konferensi oval.',
-            ]
-        );
+        $this->call(FacilitySeeder::class);
 
-        $f2 = Facility::updateOrCreate(
-            ['nama' => 'Lab Komputer Multimedia'],
-            [
-                'tipe' => 'laboratorium',
-                'kapasitas' => 45,
-                'lokasi' => 'Gedung Fasilkom Lt. 3',
-                'status' => 'tersedia',
-                'deskripsi' => 'Laboratorium dengan 45 unit PC berspesifikasi tinggi untuk praktikum dan desain multimedia.',
-            ]
-        );
+        // 3. Seed Sample Reports
+        $f1 = Facility::where('nama', 'Ruang Rapat Dosen')->first() ?? Facility::first();
+        $f2 = Facility::where('nama', 'Laboratorium Komputer 1')->first() ?? Facility::first();
+        $f3 = Facility::where('nama', 'Aula Serbaguna')->first() ?? Facility::first();
 
-        $f3 = Facility::updateOrCreate(
-            ['nama' => 'Lapangan Futsal Utama'],
-            [
-                'tipe' => 'lapangan',
-                'kapasitas' => 14,
-                'lokasi' => 'Area Olahraga Barat',
-                'status' => 'perbaikan',
-                'deskripsi' => 'Lapangan futsal rumput sintetis dengan pencahayaan LED malam hari dan jaring pengaman.',
-            ]
-        );
+        if ($f1) {
+            Report::updateOrCreate(
+                [
+                    'user_id' => $pengguna->id,
+                    'facility_id' => $f1->id,
+                    'deskripsi' => 'AC pendingin ruangan tidak berfungsi, suhu ruangan sangat panas saat rapat siang.',
+                ],
+                [
+                    'kategori' => 'Kelistrikan & Penerangan',
+                    'foto' => null,
+                    'status' => 'diproses',
+                    'catatan' => 'Petugas teknisi sedang melakukan pemeriksaan unit outdoor AC.',
+                ]
+            );
+        }
 
-        $f4 = Facility::updateOrCreate(
-            ['nama' => 'Aula Graha Utama'],
-            [
-                'tipe' => 'aula',
-                'kapasitas' => 350,
-                'lokasi' => 'Gedung Pusat Lt. 1',
-                'status' => 'tersedia',
-                'deskripsi' => 'Aula luas berkapasitas besar cocok untuk wisuda, seminar nasional, dan pameran.',
-            ]
-        );
+        if ($f2) {
+            Report::updateOrCreate(
+                [
+                    'user_id' => $pengguna->id,
+                    'facility_id' => $f2->id,
+                    'deskripsi' => 'Proyektor utama berkedip-kedip lalu mati total saat kegiatan praktikum berlangsung.',
+                ],
+                [
+                    'kategori' => 'Perangkat / Komputer',
+                    'foto' => null,
+                    'status' => 'selesai',
+                    'catatan' => 'Kabel HDMI dan adaptor daya telah diganti baru. Proyektor berfungsi normal kembali.',
+                ]
+            );
+        }
 
-        // 3. Seed Sample Reports (FR-REP-01 s/d FR-REP-05)
-        Report::updateOrCreate(
-            [
-                'user_id' => $pengguna->id,
-                'facility_id' => $f1->id,
-                'deskripsi' => 'AC pendingin ruangan tidak berfungsi, suhu ruangan sangat panas saat rapat siang.',
-            ],
-            [
-                'kategori' => 'Kelistrikan & Penerangan',
-                'foto' => null,
-                'status' => 'baru',
-                'catatan' => null,
-            ]
-        );
-
-        Report::updateOrCreate(
-            [
-                'user_id' => $pengguna->id,
-                'facility_id' => $f3->id,
-                'deskripsi' => 'Rumput sintetis di area gawang utara terkelupas dan membahayakan pemain.',
-            ],
-            [
-                'kategori' => 'Kerusakan Fisik',
-                'foto' => null,
-                'status' => 'diproses',
-                'catatan' => 'Petugas sedang melakukan pengeleman ulang dan perataan permukaan rumput sintetis.',
-            ]
-        );
-
-        Report::updateOrCreate(
-            [
-                'user_id' => $pengguna->id,
-                'facility_id' => $f2->id,
-                'deskripsi' => 'Proyektor utama berkedip-kedip lalu mati total saat kegiatan praktikum berlangsung.',
-            ],
-            [
-                'kategori' => 'Perangkat / Komputer',
-                'foto' => null,
-                'status' => 'selesai',
-                'catatan' => 'Kabel HDMI dan adaptor daya telah diganti baru. Proyektor berfungsi normal kembali.',
-            ]
-        );
-        $this->call([
-            AdminSeeder::class,
-            FacilitySeeder::class,
-        ]);
+        if ($f3) {
+            Report::updateOrCreate(
+                [
+                    'user_id' => $pengguna->id,
+                    'facility_id' => $f3->id,
+                    'deskripsi' => 'Lampu sorot panggung bagian barat mati 2 buah.',
+                ],
+                [
+                    'kategori' => 'Kelistrikan & Penerangan',
+                    'foto' => null,
+                    'status' => 'baru',
+                    'catatan' => null,
+                ]
+            );
+        }
     }
 }

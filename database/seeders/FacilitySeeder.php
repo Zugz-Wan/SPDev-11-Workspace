@@ -61,7 +61,7 @@ class FacilitySeeder extends Seeder
         ];
 
         foreach ($facilities as $facility) {
-            Facility::create($facility);
+            Facility::updateOrCreate(['nama' => $facility['nama']], $facility);
         }
     }
 }

@@ -123,4 +123,42 @@ class OfficerUpdateReportStatusTest extends TestCase
         $response->assertSessionHasErrors(['status']);
         $this->assertEquals('baru', $report->fresh()->status);
     }
+
+    public function test_closing_report_requires_catatan(): void
+    {
+        $petugas = User::factory()->petugas()->create();
+        $report = Report::factory()->diproses()->create();
+
+        // Status selesai without catatan should fail validation
+        $responseSelesai = $this->actingAs($petugas)->patch(route('officer.reports.update-status', $report), [
+            'status' => 'selesai',
+            'catatan' => '',
+        ]);
+        $responseSelesai->assertSessionHasErrors(['catatan' => 'Catatan resolusi wajib diisi saat laporan ditutup.']);
+
+        // Status ditolak without catatan should fail validation
+        $responseDitolak = $this->actingAs($petugas)->patch(route('officer.reports.update-status', $report), [
+            'status' => 'ditolak',
+            'catatan' => '',
+        ]);
+        $responseDitolak->assertSessionHasErrors(['catatan' => 'Catatan resolusi wajib diisi saat laporan ditutup.']);
+    }
+
+    public function test_facility_status_tidak_aktif_is_not_overwritten_to_perbaikan(): void
+    {
+        $petugas = User::factory()->petugas()->create();
+        $facility = Facility::factory()->create(['status' => 'tidak_aktif']);
+        $report = Report::factory()->create([
+            'facility_id' => $facility->id,
+            'status' => 'baru',
+        ]);
+
+        $this->actingAs($petugas)->patch(route('officer.reports.update-status', $report), [
+            'status' => 'diproses',
+            'catatan' => 'Mulai penanganan.',
+        ]);
+
+        // Status should remain tidak_aktif
+        $this->assertEquals('tidak_aktif', $facility->fresh()->status);
+    }
 }

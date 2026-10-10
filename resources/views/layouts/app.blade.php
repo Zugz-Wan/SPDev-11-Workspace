@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Sistem Manajemen Fasilitas & Pelaporan Kerusakan' }} - {{ config('app.name') }}</title>
+    <title>@hasSection('title')@yield('title') - {{ config('app.name') }}@else{{ $title ?? 'Sistem Manajemen Fasilitas & Pelaporan Kerusakan' }} - {{ config('app.name') }}@endif</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -50,6 +50,10 @@
                                    class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('reports.index') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                     Status Laporan Saya
                                 </a>
+                                <a href="{{ route('reservations.my') }}"
+                                   class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('reservations.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                    Reservasi Saya
+                                </a>
                             @endif
 
                             @if(auth()->user()->isPetugas())
@@ -57,9 +61,32 @@
                                    class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('officer.reports.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                     Antrian Laporan
                                 </a>
+                                <a href="{{ route('petugas.reservations.index') }}"
+                                   class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('petugas.reservations.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                    Antrian Reservasi
+                                </a>
                                 <a href="{{ route('reports.create') }}"
                                    class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('reports.create') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                     + Input Laporan
+                                </a>
+                            @endif
+
+                            @if(auth()->user()->isAdmin())
+                                <a href="{{ route('admin.facilities.index') }}"
+                                   class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('admin.facilities.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                    Kelola Fasilitas
+                                </a>
+                                <a href="{{ route('petugas.reservations.index') }}"
+                                   class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('petugas.reservations.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                    Antrian Reservasi
+                                </a>
+                                <a href="{{ route('admin.users.index') }}"
+                                   class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-amber-50 text-amber-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                    Kelola Akun
+                                </a>
+                                <a href="{{ route('admin.rekap.index') }}"
+                                   class="px-3.5 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('admin.rekap.*') ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                    Rekap
                                 </a>
                             @endif
                         @endauth
@@ -92,23 +119,9 @@
                             <a href="{{ route('login') }}" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors">
                                 Masuk
                             </a>
-                            <div class="relative inline-block group">
-                                <button type="button" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors border border-indigo-200 flex items-center space-x-1">
-                                    <span>Demo Login</span>
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                                </button>
-                                <div class="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-1 hidden group-hover:block z-50">
-                                    <a href="{{ route('quick-login', 'pengguna') }}" class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-700">
-                                        Login sbg <strong>Pengguna</strong>
-                                    </a>
-                                    <a href="{{ route('quick-login', 'petugas') }}" class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-purple-50 hover:text-purple-700">
-                                        Login sbg <strong>Petugas</strong>
-                                    </a>
-                                    <a href="{{ route('quick-login', 'admin') }}" class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700">
-                                        Login sbg <strong>Admin</strong>
-                                    </a>
-                                </div>
-                            </div>
+                            <a href="{{ route('register') }}" class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm">
+                                Daftar
+                            </a>
                         </div>
                     @endauth
                 </div>
@@ -122,9 +135,17 @@
                 @if(auth()->user()->isPengguna())
                     <a href="{{ route('reports.create') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('reports.create') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">+ Lapor Kerusakan</a>
                     <a href="{{ route('reports.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('reports.index') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Laporan Saya</a>
+                    <a href="{{ route('reservations.my') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('reservations.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Reservasi Saya</a>
                 @endif
                 @if(auth()->user()->isPetugas())
-                    <a href="{{ route('officer.reports.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('officer.reports.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Antrian Petugas</a>
+                    <a href="{{ route('officer.reports.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('officer.reports.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Antrian Laporan</a>
+                    <a href="{{ route('petugas.reservations.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('petugas.reservations.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Antrian Reservasi</a>
+                @endif
+                @if(auth()->user()->isAdmin())
+                    <a href="{{ route('admin.facilities.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.facilities.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Kelola Fasilitas</a>
+                    <a href="{{ route('petugas.reservations.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('petugas.reservations.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Antrian Reservasi</a>
+                    <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.users.*') ? 'bg-amber-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Kelola Akun</a>
+                    <a href="{{ route('admin.rekap.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.rekap.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Rekap</a>
                 @endif
             @endauth
         </div>
@@ -184,76 +205,5 @@
     </footer>
 
     @stack('scripts')
-</body>
-</html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Reservasi Fasilitas Kampus')</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen">
-
-    {{-- Navbar --}}
-    <nav class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="/facilities" class="text-xl font-bold text-blue-600">
-                🏛️ Reservasi Fasilitas
-            </a>
-            <div class="flex items-center gap-4">
-                @auth
-                    <span class="text-sm text-gray-600">
-                        Halo, <strong>{{ auth()->user()->name }}</strong>
-                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                            {{ auth()->user()->role }}
-                        </span>
-                    </span>
-                    @if(auth()->user()->role === 'admin')
-                        <a href="{{ route('admin.facilities.index') }}" class="text-sm text-gray-700 hover:text-blue-600">
-                            Kelola Fasilitas
-                        </a>
-                    @endif
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" class="text-sm text-red-600 hover:underline">
-                            Logout
-                        </button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-blue-600">Login</a>
-                    <a href="{{ route('register') }}" class="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Register</a>
-                @endauth
-            </div>
-        </div>
-    </nav>
-
-    {{-- Flash Message --}}
-    @if(session('success'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                {{ session('success') }}
-            </div>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                {{ session('error') }}
-            </div>
-        </div>
-    @endif
-
-    {{-- Content --}}
-    <main class="max-w-7xl mx-auto px-4 py-6">
-        @yield('content')
-    </main>
-
-    {{-- Footer --}}
-    <footer class="text-center text-sm text-gray-500 py-6">
-        &copy; {{ date('Y') }} PPK 2026 — Sistem Reservasi & Pelaporan Fasilitas Kampus
-    </footer>
-
 </body>
 </html>

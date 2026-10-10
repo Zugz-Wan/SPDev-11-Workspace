@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Facility;
 use App\Models\Reservation;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreReservationRequest extends FormRequest
@@ -18,7 +20,7 @@ class StoreReservationRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -41,17 +43,34 @@ class StoreReservationRequest extends FormRequest
             $start = $this->start_time;
             $end = $this->end_time;
 
-            if (!$start || !$end) {
+            if (! $start || ! $end) {
                 return;
             }
 
             // Cek kelipatan 30 menit & jam operasional 07.00-20.00
-            if (!$this->isValidSlot($start)) {
+            if (! $this->isValidSlot($start)) {
                 $validator->errors()->add('start_time', 'Waktu harus kelipatan 30 menit antara 07.00-20.00.');
             }
 
-            if (!$this->isValidSlot($end)) {
+            if (! $this->isValidSlot($end)) {
                 $validator->errors()->add('end_time', 'Waktu harus kelipatan 30 menit antara 07.00-20.00.');
+            }
+
+            // Cek status fasilitas
+            if ($this->facility_id) {
+                $facility = Facility::find($this->facility_id);
+                if (! $facility || $facility->status !== 'tersedia') {
+                    $statusLabel = $facility ? ($facility->status === 'perbaikan' ? 'Dalam Perbaikan' : 'Tidak Aktif') : 'Tidak Ditemukan';
+                    $validator->errors()->add('facility_id', "Fasilitas sedang tidak dapat direservasi ({$statusLabel}).");
+                }
+            }
+
+            // Tolak jika tanggal hari ini tetapi start_time sudah lewat
+            if ($this->tanggal && $start) {
+                $isToday = $this->tanggal === now()->format('Y-m-d');
+                if ($isToday && $start <= now()->format('H:i')) {
+                    $validator->errors()->add('start_time', 'Jam mulai tidak boleh lebih awal atau sama dengan waktu saat ini untuk reservasi hari ini.');
+                }
             }
 
             // Cek bentrok jadwal (hanya yang berstatus 'disetujui')
@@ -61,7 +80,7 @@ class StoreReservationRequest extends FormRequest
                     ->where('status', 'disetujui')
                     ->where(function ($q) use ($start, $end) {
                         $q->where('start_time', '<', $end)
-                          ->where('end_time', '>', $start);
+                            ->where('end_time', '>', $start);
                     })
                     ->exists();
 
@@ -77,7 +96,7 @@ class StoreReservationRequest extends FormRequest
      */
     private function isValidSlot(string $time): bool
     {
-        if (!preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $time)) {
+        if (! preg_match('/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/', $time)) {
             return false;
         }
 
@@ -94,4 +113,3 @@ class StoreReservationRequest extends FormRequest
         return true;
     }
 }
-

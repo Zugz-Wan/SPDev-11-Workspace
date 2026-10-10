@@ -39,11 +39,11 @@
             Edit
         </a>
         <form method="POST" action="{{ route('admin.facilities.destroy', $facility->id) }}"
-              onsubmit="return confirm('Yakin hapus fasilitas ini?')">
+              onsubmit="return confirm('Yakin ingin menonaktifkan fasilitas ini?')">
             @csrf
             @method('DELETE')
             <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                Hapus
+                Nonaktifkan
             </button>
         </form>
     </div>

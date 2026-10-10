@@ -51,10 +51,10 @@
                                class="text-yellow-600 hover:underline ml-3">Edit</a>
                             <form method="POST" action="{{ route('admin.facilities.destroy', $facility->id) }}"
                                   class="inline ml-3"
-                                  onsubmit="return confirm('Yakin hapus fasilitas ini?')">
+                                  onsubmit="return confirm('Yakin ingin menonaktifkan fasilitas ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:underline">Hapus</button>
+                                <button type="submit" class="text-red-600 hover:underline">Nonaktifkan</button>
                             </form>
                         </td>
                     </tr>

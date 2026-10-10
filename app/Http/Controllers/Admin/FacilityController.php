@@ -11,6 +11,7 @@ class FacilityController extends Controller
     public function index()
     {
         $facilities = Facility::latest()->paginate(10);
+
         return view('admin.facilities.index', compact('facilities'));
     }
 
@@ -39,12 +40,14 @@ class FacilityController extends Controller
     public function show(string $id)
     {
         $facility = Facility::findOrFail($id);
+
         return view('admin.facilities.show', compact('facility'));
     }
 
     public function edit(string $id)
     {
         $facility = Facility::findOrFail($id);
+
         return view('admin.facilities.edit', compact('facility'));
     }
 
@@ -70,9 +73,9 @@ class FacilityController extends Controller
     public function destroy(string $id)
     {
         $facility = Facility::findOrFail($id);
-        $facility->delete();
+        $facility->update(['status' => 'tidak_aktif']);
 
         return redirect()->route('admin.facilities.index')
-            ->with('success', 'Fasilitas berhasil dihapus.');
+            ->with('success', 'Fasilitas dinonaktifkan.');
     }
 }

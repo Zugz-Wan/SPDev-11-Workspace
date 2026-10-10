@@ -24,7 +24,7 @@ class UpdateReportStatusRequest extends FormRequest
     {
         return [
             'status' => ['required', 'string', 'in:baru,diproses,selesai,ditolak'],
-            'catatan' => ['nullable', 'string', 'max:1000'],
+            'catatan' => ['required_if:status,selesai,ditolak', 'nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -38,6 +38,7 @@ class UpdateReportStatusRequest extends FormRequest
         return [
             'status.required' => 'Status laporan wajib dipilih.',
             'status.in' => 'Status harus salah satu dari: baru, diproses, selesai, atau ditolak.',
+            'catatan.required_if' => 'Catatan resolusi wajib diisi saat laporan ditutup.',
             'catatan.max' => 'Catatan petugas maksimal :max karakter.',
         ];
     }

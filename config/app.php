@@ -123,4 +123,5 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'reservation_cancellation_hours' => (int) env('RESERVATION_CANCELLATION_HOURS', 2),
 ];

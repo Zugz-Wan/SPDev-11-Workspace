@@ -98,9 +98,11 @@ class OfficerReportController extends Controller
             $facility = $report->facility;
 
             if ($facility) {
-                // Ketika laporan kerusakan sedang ditangani ('diproses'), status fasilitas menjadi 'perbaikan'
+                // Ketika laporan kerusakan sedang ditangani ('diproses'), status fasilitas menjadi 'perbaikan' hanya jika saat ini 'tersedia'
                 if ($newStatus === 'diproses') {
-                    $facility->update(['status' => 'perbaikan']);
+                    if ($facility->status === 'tersedia') {
+                        $facility->update(['status' => 'perbaikan']);
+                    }
                 } elseif ($oldStatus === 'diproses' && in_array($newStatus, ['selesai', 'ditolak', 'baru'], true)) {
                     // Cek apakah masih ada laporan aktif lain yang sedang 'diproses' untuk fasilitas ini
                     $hasOtherDiprosesReports = $facility->reports()

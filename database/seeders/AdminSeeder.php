@@ -11,30 +11,36 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Akun Admin
-        User::create([
-            'name' => 'Admin Kampus',
-            'email' => 'admin@kampus.test',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'status_akun' => 'terverifikasi',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@kampus.test'],
+            [
+                'name' => 'Admin Kampus',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'status_akun' => 'terverifikasi',
+            ]
+        );
 
         // Akun Petugas
-        User::create([
-            'name' => 'Petugas Fasilitas',
-            'email' => 'petugas@kampus.test',
-            'password' => Hash::make('password'),
-            'role' => 'petugas',
-            'status_akun' => 'terverifikasi',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'petugas@kampus.test'],
+            [
+                'name' => 'Petugas Fasilitas',
+                'password' => Hash::make('password'),
+                'role' => 'petugas',
+                'status_akun' => 'terverifikasi',
+            ]
+        );
 
         // Akun Pengguna (buat testing)
-        User::create([
-            'name' => 'Pengguna Biasa',
-            'email' => 'user@kampus.test',
-            'password' => Hash::make('password'),
-            'role' => 'pengguna',
-            'status_akun' => 'terverifikasi',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'user@kampus.test'],
+            [
+                'name' => 'Pengguna Biasa',
+                'password' => Hash::make('password'),
+                'role' => 'pengguna',
+                'status_akun' => 'terverifikasi',
+            ]
+        );
     }
 }

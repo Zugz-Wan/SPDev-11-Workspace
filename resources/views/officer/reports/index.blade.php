@@ -11,6 +11,20 @@
             <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Antrian Laporan Kerusakan Fasilitas</h1>
             <p class="text-slate-500 text-sm mt-1">Kelola antrian laporan masuk, tindak lanjut perbaikan, dan pembaruan otomatis ketersediaan fasilitas.</p>
         </div>
+        <div class="flex items-center gap-2">
+            @php
+                $pendingReservationsCount = \App\Models\Reservation::where('status', 'pending')->count();
+            @endphp
+            <a href="{{ route('petugas.reservations.index') }}" class="inline-flex items-center px-4 py-2.5 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Antrian Reservasi
+                @if($pendingReservationsCount > 0)
+                    <span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
+                        {{ $pendingReservationsCount }} Pending
+                    </span>
+                @endif
+            </a>
+        </div>
     </div>
 
     <!-- Status Metric Cards (FR-REP-03) -->

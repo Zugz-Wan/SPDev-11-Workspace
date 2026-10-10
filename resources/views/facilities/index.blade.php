@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Daftar Fasilitas')
+
 @section('content')
 <div class="space-y-6">
     <!-- Hero Banner -->
@@ -18,7 +20,7 @@
 
     <!-- Filter & Search Bar -->
     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <form action="{{ route('facilities.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <form action="{{ route('facilities.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
                 <input type="text" name="search" value="{{ $search }}" placeholder="Cari nama fasilitas, gedung, lokasi..." class="w-full text-xs rounded-xl border border-slate-300 px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
@@ -30,6 +32,10 @@
                     <option value="perbaikan" {{ $currentStatus === 'perbaikan' ? 'selected' : '' }}>Dalam Perbaikan</option>
                     <option value="tidak_aktif" {{ $currentStatus === 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif</option>
                 </select>
+            </div>
+
+            <div>
+                <input type="number" name="kapasitas" value="{{ $kapasitas ?? '' }}" min="1" placeholder="Min. kapasitas orang..." class="w-full text-xs rounded-xl border border-slate-300 px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
             <div class="flex items-center space-x-2">
@@ -70,7 +76,9 @@
                         </div>
 
                         <!-- Facility Name & Location -->
-                        <h3 class="text-lg font-bold text-slate-900 leading-snug">{{ $facility->nama }}</h3>
+                        <a href="{{ route('facilities.show', $facility->id) }}" class="group/title block">
+                            <h3 class="text-lg font-bold text-slate-900 leading-snug group-hover/title:text-indigo-600 transition-colors">{{ $facility->nama }}</h3>
+                        </a>
                         <p class="text-xs text-slate-500 flex items-center mt-1">
                             <svg class="w-3.5 h-3.5 mr-1 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             {{ $facility->lokasi }}
@@ -104,9 +112,12 @@
                     </div>
 
                     <!-- Bottom Action Button -->
-                    <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                        <a href="{{ route('reports.create', ['facility_id' => $facility->id]) }}" class="w-full text-center px-4 py-2 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors">
-                            + Laporkan Masalah Fasilitas Ini
+                    <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <a href="{{ route('facilities.show', $facility->id) }}" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 transition-colors">
+                            Detail
+                        </a>
+                        <a href="{{ route('reports.create', ['facility_id' => $facility->id]) }}" class="flex-1 text-center px-4 py-2 rounded-xl text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors">
+                            + Laporkan Masalah
                         </a>
                     </div>
                 </div>
@@ -118,40 +129,4 @@
         </div>
     @endif
 </div>
-@endsection
-@section('title', 'Daftar Fasilitas')
-
-@section('content')
-<h1 class="text-3xl font-bold mb-6">Daftar Fasilitas Kampus</h1>
-
-@if($facilities->count() === 0)
-    <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-        Belum ada fasilitas tersedia.
-    </div>
-@else
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        @foreach($facilities as $facility)
-            <div class="bg-white rounded shadow p-4 hover:shadow-lg transition">
-                <h2 class="text-xl font-bold mb-2">{{ $facility->nama }}</h2>
-                <p class="text-sm text-gray-600 mb-1">
-                    <strong>Tipe:</strong> {{ ucfirst($facility->tipe) }}
-                </p>
-                <p class="text-sm text-gray-600 mb-1">
-                    <strong>Kapasitas:</strong> {{ $facility->kapasitas }} orang
-                </p>
-                <p class="text-sm text-gray-600 mb-3">
-                    <strong>Lokasi:</strong> {{ $facility->lokasi }}
-                </p>
-                <a href="{{ route('facilities.show', $facility->id) }}"
-                   class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
-                    Lihat Detail
-                </a>
-            </div>
-        @endforeach
-    </div>
-
-    <div class="mt-6">
-        {{ $facilities->links() }}
-    </div>
-@endif
 @endsection
