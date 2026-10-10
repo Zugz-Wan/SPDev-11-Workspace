@@ -10,46 +10,43 @@ use Illuminate\Support\Facades\DB;
 class PetugasReservationController extends Controller
 {
     /**
-     * Tampilkan daftar reservasi untuk petugas.
-     * Bisa difilter berdasarkan status (default: pending).
+     * Tampilkan antrian reservasi untuk petugas & admin.
      */
     public function index(Request $request)
     {
-        $status = $request->query('status', 'pending');
+        $status = $request->query('status');
+        $search = $request->query('search');
 
-        $query = Reservation::with(['user', 'facility']);
+        $query = Reservation::with(['user', 'facility'])->latest();
 
-        if ($status !== 'semua' && $status !== '') {
+        if ($status && $status !== 'semua') {
             $query->where('status', $status);
         }
 
-        if ($request->wantsJson()) {
-            return response()->json($query->latest()->get());
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('facility', function ($fq) use ($search) {
+                    $fq->where('nama', 'like', "%{$search}%");
+                })->orWhereHas('user', function ($uq) use ($search) {
+                    $uq->where('name', 'like', "%{$search}%");
+                })->orWhere('keperluan', 'like', "%{$search}%");
+            });
         }
 
-        $reservations = $query->latest('tanggal')->latest('start_time')->paginate(12)->withQueryString();
+        $reservations = $query->paginate(15)->withQueryString();
+
+        if ($request->expectsJson() && ! $request->hasHeader('X-Inertia') && ! $request->acceptsHtml()) {
+            return response()->json($request->has('status') ? $query->get() : Reservation::with(['user', 'facility'])->latest()->get());
+        }
 
         $pendingCount = Reservation::where('status', 'pending')->count();
         $approvedCount = Reservation::where('status', 'disetujui')->count();
-        $rejectedCount = Reservation::where('status', 'ditolak')->count();
-        $cancelledCount = Reservation::where('status', 'dibatalkan')->count();
-        $totalCount = Reservation::count();
-        $newReportsCount = Report::where('status', 'baru')->count();
 
-        return view('petugas.reservations.index', compact(
-            'reservations',
-            'status',
-            'pendingCount',
-            'approvedCount',
-            'rejectedCount',
-            'cancelledCount',
-            'totalCount',
-            'newReportsCount'
-        ));
+        return view('officer.reservations.index', compact('reservations', 'status', 'search', 'pendingCount', 'approvedCount'));
     }
 
     /**
-     * Setujui reservasi.
+     * Setujui reservasi dan cegah bentrok jadwal.
      */
     public function approve(Request $request, $id)
     {
@@ -57,32 +54,33 @@ class PetugasReservationController extends Controller
             $reservation = Reservation::where('id', $id)->lockForUpdate()->firstOrFail();
 
             if ($reservation->status !== 'pending') {
-                if ($request->wantsJson()) {
+                if ($request->expectsJson() && ! $request->acceptsHtml()) {
                     return response()->json(['message' => 'Hanya reservasi pending yang bisa disetujui'], 422);
                 }
 
                 return back()->with('error', 'Hanya reservasi pending yang bisa disetujui');
             }
 
-            // Cek bentrok jadwal dengan reservasi lain yang sudah disetujui
+            // Validasi bentrok jadwal
             $conflict = Reservation::where('facility_id', $reservation->facility_id)
                 ->where('tanggal', $reservation->tanggal)
                 ->where('status', 'disetujui')
                 ->where('id', '!=', $reservation->id)
-                ->where(function ($query) use ($reservation) {
-                    $query->where('start_time', '<', $reservation->end_time)
+                ->where(function ($q) use ($reservation) {
+                    $q->where('start_time', '<', $reservation->end_time)
                         ->where('end_time', '>', $reservation->start_time);
                 })
                 ->lockForUpdate()
                 ->exists();
 
             if ($conflict) {
-                $msg = 'Jadwal reservasi bentrok dengan reservasi lain yang sudah disetujui.';
-                if ($request->wantsJson()) {
-                    return response()->json(['message' => $msg], 422);
+                if ($request->expectsJson() && ! $request->acceptsHtml()) {
+                    return response()->json([
+                        'message' => 'Gagal menyetujui: Jadwal bentrok dengan reservasi lain yang sudah disetujui pada fasilitas yang sama.',
+                    ], 422);
                 }
 
-                return back()->with('error', $msg);
+                return back()->with('error', 'Gagal menyetujui: Jadwal bentrok dengan reservasi lain yang sudah disetujui pada fasilitas dan jam yang sama.');
             }
 
             $reservation->update([
@@ -90,26 +88,26 @@ class PetugasReservationController extends Controller
                 'catatan_petugas' => $request->catatan_petugas ?? $reservation->catatan_petugas,
             ]);
 
-            if ($request->wantsJson()) {
+            if ($request->expectsJson() && ! $request->acceptsHtml()) {
                 return response()->json([
                     'message' => 'Reservasi telah disetujui.',
                     'data' => $reservation->load(['user', 'facility']),
                 ]);
             }
 
-            return back()->with('success', "Reservasi #{$reservation->id} untuk fasilitas {$reservation->facility->nama} telah disetujui.");
+            return back()->with('success', "Reservasi #{$reservation->id} untuk fasilitas '{$reservation->facility->nama}' berhasil disetujui.");
         });
     }
 
     /**
-     * Tolak reservasi.
+     * Tolak permohonan reservasi.
      */
     public function reject(Request $request, $id)
     {
         $reservation = Reservation::findOrFail($id);
 
         if ($reservation->status !== 'pending') {
-            if ($request->wantsJson()) {
+            if ($request->expectsJson() && ! $request->acceptsHtml()) {
                 return response()->json(['message' => 'Hanya reservasi pending yang bisa ditolak'], 422);
             }
 
@@ -121,14 +119,14 @@ class PetugasReservationController extends Controller
             'alasan' => 'nullable|string|max:255',
         ]);
 
-        $alasan = $request->alasan ?? $request->catatan_petugas ?? $reservation->catatan_petugas;
+        $alasan = $request->alasan ?? $request->catatan_petugas ?? 'Tidak memenuhi syarat penggunaan fasilitas.';
 
         $reservation->update([
             'status' => 'ditolak',
             'catatan_petugas' => $alasan,
         ]);
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() && ! $request->acceptsHtml()) {
             return response()->json([
                 'message' => 'Reservasi telah ditolak.',
                 'data' => $reservation->load(['user', 'facility']),
@@ -139,36 +137,39 @@ class PetugasReservationController extends Controller
     }
 
     /**
-     * Batalkan reservasi oleh petugas (hanya status disetujui, wajib alasan_pembatalan).
+     * Batalkan reservasi yang sudah disetujui dalam kondisi mendesak dengan alasan.
      */
     public function cancel(Request $request, $id)
     {
+        $request->validate([
+            'alasan_pembatalan' => 'required_without:catatan_petugas|nullable|string|max:255',
+            'catatan_petugas' => 'required_without:alasan_pembatalan|nullable|string|max:255',
+        ]);
+
         $reservation = Reservation::findOrFail($id);
 
         if ($reservation->status !== 'disetujui') {
-            if ($request->wantsJson()) {
+            if ($request->expectsJson() && ! $request->acceptsHtml()) {
                 return response()->json(['message' => 'Hanya reservasi yang sudah disetujui yang dapat dibatalkan petugas.'], 422);
             }
 
             return back()->with('error', 'Hanya reservasi yang sudah disetujui yang dapat dibatalkan petugas.');
         }
 
-        $request->validate([
-            'alasan_pembatalan' => 'required|string|max:255',
-        ]);
+        $alasan = $request->alasan_pembatalan ?? $request->catatan_petugas;
 
         $reservation->update([
             'status' => 'dibatalkan',
-            'catatan_petugas' => $request->alasan_pembatalan,
+            'catatan_petugas' => $alasan,
         ]);
 
-        if ($request->wantsJson()) {
+        if ($request->expectsJson() && ! $request->acceptsHtml()) {
             return response()->json([
                 'message' => 'Reservasi berhasil dibatalkan oleh petugas.',
                 'data' => $reservation->load(['user', 'facility']),
             ]);
         }
 
-        return back()->with('success', "Reservasi #{$reservation->id} berhasil dibatalkan oleh petugas.");
+        return back()->with('success', "Reservasi #{$reservation->id} telah dibatalkan dengan alasan: {$alasan}");
     }
 }

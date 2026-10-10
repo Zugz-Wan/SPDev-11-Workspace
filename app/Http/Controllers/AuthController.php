@@ -32,7 +32,7 @@ class AuthController extends Controller
             'status_akun' => 'pending',
         ]);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil, akun menunggu verifikasi admin.');
+        return redirect()->route('login')->with('success', 'Registrasi berhasil! Akun Anda telah dibuat dan menunggu verifikasi dari Administrator sebelum dapat digunakan untuk login.');
     }
 
     public function showLogin(): View
@@ -57,8 +57,8 @@ class AuthController extends Controller
                 $request->session()->regenerateToken();
 
                 return back()->withErrors([
-                    'email' => 'Akun Anda belum diverifikasi admin',
-                ])->with('error', 'Akun Anda belum diverifikasi admin')->onlyInput('email');
+                    'email' => 'Akun Anda berhasil terdaftar namun masih menunggu verifikasi oleh Administrator sebelum dapat login.',
+                ])->onlyInput('email');
             }
 
             if ($user->status_akun === 'ditolak') {
@@ -67,11 +67,15 @@ class AuthController extends Controller
                 $request->session()->regenerateToken();
 
                 return back()->withErrors([
-                    'email' => 'Registrasi akun Anda ditolak',
-                ])->with('error', 'Registrasi akun Anda ditolak')->onlyInput('email');
+                    'email' => 'Registrasi akun Anda ditolak oleh Administrator.',
+                ])->onlyInput('email');
             }
 
             $request->session()->regenerate();
+
+            if ($user->isAdmin()) {
+                return redirect()->intended(route('admin.facilities.index'));
+            }
 
             if ($user->isPetugas()) {
                 return redirect()->intended(route('officer.reports.index'));

@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $pengguna = User::updateOrCreate(
             ['email' => 'user@kampus.test'],
             [
-                'name' => 'Pengguna Biasa',
+                'name' => 'Pengguna Kampus',
                 'password' => Hash::make('password'),
                 'role' => 'pengguna',
                 'status_akun' => 'terverifikasi',

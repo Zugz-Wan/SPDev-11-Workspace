@@ -7,21 +7,20 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class UserController extends Controller
 {
     /**
-     * Daftar semua akun dengan filter role dan status_akun.
+     * Tampilkan daftar seluruh akun dan antrian verifikasi akun mandiri.
      */
     public function index(Request $request): View
     {
         $roleFilter = $request->string('role')->toString();
-        $statusFilter = $request->string('status_akun')->toString();
+        $statusFilter = $request->string('status')->toString();
         $search = $request->string('search')->toString();
 
-        $query = User::latest();
+        $query = User::query()->latest();
 
         if ($roleFilter !== '') {
             $query->where('role', $roleFilter);
@@ -40,30 +39,13 @@ class UserController extends Controller
 
         $users = $query->paginate(15)->withQueryString();
 
-        $pendingUsers = User::where('role', 'pengguna')
-            ->where('status_akun', 'pending')
-            ->latest()
-            ->get();
+        $pendingCount = User::where('status_akun', 'pending')->count();
 
-        $counts = [
-            'total' => User::count(),
-            'pending' => User::where('status_akun', 'pending')->count(),
-            'terverifikasi' => User::where('status_akun', 'terverifikasi')->count(),
-            'ditolak' => User::where('status_akun', 'ditolak')->count(),
-        ];
-
-        return view('admin.users.index', compact(
-            'users',
-            'pendingUsers',
-            'counts',
-            'roleFilter',
-            'statusFilter',
-            'search'
-        ));
+        return view('admin.users.index', compact('users', 'roleFilter', 'statusFilter', 'search', 'pendingCount'));
     }
 
     /**
-     * Form buat akun baru oleh admin.
+     * Form tambah akun langsung oleh admin.
      */
     public function create(): View
     {
@@ -71,16 +53,15 @@ class UserController extends Controller
     }
 
     /**
-     * Simpan akun baru, langsung terverifikasi.
-     * Admin hanya dapat membuat akun role 'pengguna' atau 'petugas'.
+     * Simpan akun baru yang dibuat langsung oleh admin.
      */
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
-            'role' => ['required', Rule::in(['pengguna', 'petugas'])],
+            'password' => ['required', 'string', 'min:6'],
+            'role' => ['required', 'in:petugas,pengguna,admin'],
         ]);
 
         User::create([
@@ -92,34 +73,33 @@ class UserController extends Controller
         ]);
 
         return redirect()->route('admin.users.index')
-            ->with('success', "Akun {$validated['name']} ({$validated['role']}) berhasil dibuat dan langsung aktif.");
+            ->with('success', "Akun {$validated['role']} untuk {$validated['name']} berhasil didaftarkan langsung oleh Admin.");
     }
 
     /**
-     * Verifikasi akun pengguna (set status_akun ke 'terverifikasi').
+     * Setujui / verifikasi akun registrasi mandiri.
      */
-    public function verify(Request $request, User $user): RedirectResponse
+    public function verify(string $id): RedirectResponse
     {
-        if ($user->status_akun !== 'pending') {
-            return back()->with('error', 'Hanya akun berstatus pending yang dapat diverifikasi.');
-        }
+        $user = User::findOrFail($id);
 
-        $user->update(['status_akun' => 'terverifikasi']);
+        $user->update([
+            'status_akun' => 'terverifikasi',
+        ]);
 
-        return back()->with('success', "Akun {$user->name} ({$user->email}) berhasil diverifikasi.");
+        return back()->with('success', "Akun pengguna '{$user->name}' ({$user->email}) telah berhasil diverifikasi dan kini dapat login.");
     }
 
     /**
-     * Tolak akun pengguna (set status_akun ke 'ditolak').
+     * Tolak akun registrasi mandiri.
      */
-    public function reject(Request $request, User $user): RedirectResponse
+    public function reject(string $id): RedirectResponse
     {
-        if ($user->status_akun !== 'pending') {
-            return back()->with('error', 'Hanya akun berstatus pending yang dapat ditolak.');
-        }
+        $user = User::findOrFail($id);
 
-        $user->update(['status_akun' => 'ditolak']);
+        $name = $user->name;
+        $user->delete();
 
-        return back()->with('success', "Akun {$user->name} ({$user->email}) telah ditolak.");
+        return back()->with('success', "Akun registrasi mandiri '{$name}' telah ditolak dan dihapus dari sistem.");
     }
 }

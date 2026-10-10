@@ -6,7 +6,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <div class="inline-flex items-center space-x-2 bg-purple-50 text-purple-700 border border-purple-100 px-3 py-1 rounded-full text-xs font-semibold mb-2">
-                <span>FR-REP-03 & FR-REP-04 • Dashboard Petugas Teknis</span>
+                <span>Dashboard Petugas Teknis</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Antrian Laporan Kerusakan Fasilitas</h1>
             <p class="text-slate-500 text-sm mt-1">Kelola antrian laporan masuk, tindak lanjut perbaikan, dan pembaruan otomatis ketersediaan fasilitas.</p>
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <!-- Status Metric Cards (FR-REP-03) -->
+    <!-- Status Metric Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
         <a href="{{ route('officer.reports.index') }}" class="p-4 rounded-2xl border transition-all {{ $currentStatus === '' ? 'bg-purple-50 border-purple-200 ring-2 ring-purple-500/20' : 'bg-white border-slate-200 hover:border-slate-300' }}">
             <div class="text-xs font-semibold text-slate-500">Total Semua Laporan</div>
@@ -109,7 +109,7 @@
         </form>
     </div>
 
-    <!-- Reports Queue (FR-REP-03) -->
+    <!-- Reports Queue -->
     @if($reports->isEmpty())
         <div class="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-sm">
             <div class="w-16 h-16 mx-auto rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4">
@@ -181,7 +181,7 @@
                         @endif
                     </div>
 
-                    <!-- Card Bottom: Status Update Form (FR-REP-04 & FR-REP-05) -->
+                    <!-- Card Bottom: Status Update Form -->
                     <div class="pt-3 border-t border-slate-100">
                         <form action="{{ route('officer.reports.update-status', $report) }}" method="POST" class="space-y-3">
                             @csrf
@@ -203,11 +203,11 @@
                                 </div>
                             </div>
 
-                            <!-- Automatic sync info notice (FR-REP-05) -->
+                            <!-- Automatic sync info notice -->
                             <div class="flex items-center justify-between text-[11px] text-slate-500">
                                 <span class="inline-flex items-center text-[10px] text-slate-400">
                                     <svg class="w-3 h-3 mr-1 text-purple-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
-                                    FR-REP-05: Otomatis sinkron status fasilitas
+                                    Otomatis sinkron status fasilitas
                                 </span>
                                 <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-purple-600 hover:bg-purple-700 shadow-sm transition-colors">
                                     Perbarui Status

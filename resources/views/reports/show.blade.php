@@ -44,7 +44,7 @@
                     </div>
                 </div>
 
-                <!-- Catatan Petugas (FR-REP-04) -->
+                <!-- Catatan Petugas -->
                 <div>
                     <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Tindak Lanjut & Catatan Petugas</h3>
                     @if($report->catatan)

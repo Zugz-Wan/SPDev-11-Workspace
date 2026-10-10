@@ -15,7 +15,7 @@
     <div class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-violet-600 rounded-2xl p-6 sm:p-8 text-white shadow-lg mb-8">
         <div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-3">
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span>FR-REP-01 • Layanan Aduan Pengguna</span>
+            <span>Layanan Aduan Fasilitas</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Laporkan Kerusakan Fasilitas</h1>
         <p class="mt-2 text-indigo-100 text-sm max-w-xl">
@@ -50,7 +50,7 @@
                 @enderror
             </div>
 
-            <!-- 2. Kategori Kerusakan (FR-REP-01) -->
+            <!-- 2. Kategori Kerusakan -->
             <div>
                 <label for="kategori" class="block text-sm font-semibold text-slate-800 mb-1.5">
                     Kategori Kerusakan / Masalah <span class="text-rose-500">*</span>
@@ -70,7 +70,7 @@
                 @enderror
             </div>
 
-            <!-- 3. Deskripsi Kerusakan (FR-REP-01) -->
+            <!-- 3. Deskripsi Kerusakan -->
             <div>
                 <label for="deskripsi" class="block text-sm font-semibold text-slate-800 mb-1.5">
                     Deskripsi Lengkap Kerusakan <span class="text-rose-500">*</span>
@@ -86,7 +86,7 @@
                 @enderror
             </div>
 
-            <!-- 4. Foto Bukti Kerusakan (FR-REP-01) -->
+            <!-- 4. Foto Bukti Kerusakan -->
             <div>
                 <label class="block text-sm font-semibold text-slate-800 mb-1.5">
                     Foto Bukti Kerusakan <span class="text-slate-400 font-normal">(Opsional)</span>

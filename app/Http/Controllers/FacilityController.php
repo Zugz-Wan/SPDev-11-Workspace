@@ -10,10 +10,15 @@ use Illuminate\View\View;
 
 class FacilityController extends Controller
 {
+    /**
+     * Tampilkan katalog fasilitas dengan filter tipe, lokasi, kapasitas, dan status.
+     */
     public function index(Request $request): View
     {
         $statusFilter = $request->string('status')->toString();
         $typeFilter = $request->string('tipe')->toString();
+        $locationFilter = $request->string('lokasi')->toString();
+        $capacityFilter = $request->string('kapasitas')->toString();
         $search = $request->string('search')->toString();
         $kapasitas = $request->filled('kapasitas') && is_numeric($request->query('kapasitas'))
             ? (int) $request->query('kapasitas')
@@ -31,8 +36,22 @@ class FacilityController extends Controller
             $query->where('tipe', $typeFilter);
         }
 
-        if ($kapasitas !== null) {
-            $query->where('kapasitas', '>=', $kapasitas);
+        if ($locationFilter !== '') {
+            $query->where('lokasi', 'like', "%{$locationFilter}%");
+        }
+
+        if ($capacityFilter !== '') {
+            if ($capacityFilter === 'small') {
+                $query->where('kapasitas', '<=', 20);
+            } elseif ($capacityFilter === 'medium') {
+                $query->whereBetween('kapasitas', [21, 50]);
+            } elseif ($capacityFilter === 'large') {
+                $query->whereBetween('kapasitas', [51, 100]);
+            } elseif ($capacityFilter === 'xlarge') {
+                $query->where('kapasitas', '>', 100);
+            } elseif (is_numeric($capacityFilter)) {
+                $query->where('kapasitas', '>=', (int) $capacityFilter);
+            }
         }
 
         if ($search !== '') {
@@ -46,12 +65,16 @@ class FacilityController extends Controller
         $facilities = $query->paginate(12)->withQueryString();
 
         $types = Facility::distinct()->pluck('tipe')->filter()->values();
+        $locations = Facility::distinct()->pluck('lokasi')->filter()->values();
 
         return view('facilities.index', [
             'facilities' => $facilities,
             'types' => $types,
+            'locations' => $locations,
             'currentStatus' => $statusFilter,
             'currentType' => $typeFilter,
+            'currentLocation' => $locationFilter,
+            'currentCapacity' => $capacityFilter,
             'search' => $search,
             'kapasitas' => $kapasitas,
         ]);
@@ -63,7 +86,7 @@ class FacilityController extends Controller
             $q->whereIn('status', ['baru', 'diproses']);
         }])->findOrFail($id);
 
-        $selectedDate = $request->query('tanggal', now()->format('Y-m-d'));
+        $selectedDate = $request->query('date', $request->query('tanggal', now()->format('Y-m-d')));
         try {
             $parsedDate = Carbon::parse($selectedDate)->format('Y-m-d');
             $selectedDate = $parsedDate;
@@ -95,6 +118,7 @@ class FacilityController extends Controller
                 'start' => $slotStart,
                 'end' => $slotEnd,
                 'available' => ! $isOccupied,
+                'is_booked' => $isOccupied,
             ];
 
             $current->addMinutes(30);

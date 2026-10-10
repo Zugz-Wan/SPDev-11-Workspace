@@ -32,11 +32,11 @@ class AdminSeeder extends Seeder
             ]
         );
 
-        // Akun Pengguna (buat testing)
+        // Akun Pengguna
         User::updateOrCreate(
             ['email' => 'user@kampus.test'],
             [
-                'name' => 'Pengguna Biasa',
+                'name' => 'Pengguna Kampus',
                 'password' => Hash::make('password'),
                 'role' => 'pengguna',
                 'status_akun' => 'terverifikasi',

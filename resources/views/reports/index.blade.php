@@ -5,9 +5,6 @@
     <!-- Header with Action -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <div class="inline-flex items-center space-x-2 bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 rounded-full text-xs font-semibold mb-2">
-                <span>FR-REP-02 • Riwayat Aduan</span>
-            </div>
             <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Status Laporan Saya</h1>
             <p class="text-slate-500 text-sm mt-1">Pantau perkembangan tindak lanjut dan catatan teknisi dari laporan kerusakan fasilitas yang telah diajukan.</p>
         </div>
@@ -108,7 +105,7 @@
                                 {{ $report->deskripsi }}
                             </p>
 
-                            <!-- Catatan Petugas (FR-REP-04) -->
+                            <!-- Catatan Petugas -->
                             @if($report->catatan)
                                 <div class="mt-3 p-3.5 rounded-xl {{ $report->status === 'ditolak' ? 'bg-rose-50 border border-rose-200 text-rose-900' : 'bg-blue-50/80 border border-blue-200 text-blue-900' }}">
                                     <div class="flex items-start space-x-2">
