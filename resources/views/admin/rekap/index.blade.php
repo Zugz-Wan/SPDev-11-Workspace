@@ -19,7 +19,7 @@
             </p>
         </div>
 
-        {{-- Action Export Buttons --}}
+        {{-- Action Export Buttons (Hanya 2 Pilihan Format: CSV dan PDF) --}}
         <div class="flex flex-wrap items-center gap-2.5">
             {{-- Dropdown / Group Ekspor CSV --}}
             <div class="relative inline-block text-left" x-data="{ open: false }">

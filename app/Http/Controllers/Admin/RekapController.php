@@ -58,7 +58,7 @@ class RekapController extends Controller
     }
 
     /**
-     * Ekspor data rekap ke format CSV.
+     * Ekspor data rekap ke format CSV (terstruktur rapi seperti laporan PDF dan kompatibel Excel).
      */
     public function exportCsv(Request $request): StreamedResponse
     {
@@ -83,21 +83,42 @@ class RekapController extends Controller
             $handle = fopen('php://output', 'w');
             // Write UTF-8 BOM for Microsoft Excel compatibility
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            // Perintahkan Excel untuk menggunakan pemisah koma agar kolom langsung terpisah di Windows
+            fwrite($handle, "sep=,\r\n");
 
+            // 1. Kop Laporan Resmi (Sama dengan Header PDF)
+            fputcsv($handle, ['FASILITASKITA', '', '', '', 'DOKUMEN RESMI REKAPITULASI']);
+            fputcsv($handle, ['Sistem Manajemen Fasilitas, Okupansi & Pelaporan Kerusakan', '', '', '', 'Dicetak: '.now()->translatedFormat('d F Y, H:i').' WIB']);
+            fputcsv($handle, ['', '', '', '', 'Oleh: '.auth()->user()->name.' ('.ucfirst(auth()->user()->role).')']);
+            fputcsv($handle, []);
+            fputcsv($handle, ['LAPORAN REKAPITULASI PENGGUNAAN & KERUSAKAN FASILITAS']);
+            fputcsv($handle, ['Periode Laporan:', $data['periodeLabel']]);
+            fputcsv($handle, []);
+
+            // 2. Ringkasan Eksekutif KPI (Sama dengan Kotak Metrik PDF)
+            fputcsv($handle, ['=== RINGKASAN METRIK KPI ===']);
+            fputcsv($handle, ['Total Fasilitas', 'Reservasi Disetujui', 'Total Jam Terpakai', 'Laporan Kerusakan']);
+            fputcsv($handle, [
+                $data['summary']['total_facilities'].' Unit',
+                $data['summary']['total_approved_reservations'].' Reservasi',
+                $data['summary']['total_hours_used'].' Jam',
+                $data['summary']['total_reports'].' ('.$data['summary']['total_reports_resolved'].' Selesai)',
+            ]);
+            fputcsv($handle, []);
+
+            // 3. TABEL 1: Okupansi Fasilitas
             if ($type === 'occupancy' || $type === 'all') {
-                fputcsv($handle, ['=== REKAP OKUPANSI FASILITAS (RESERVASI DISETUJUI & JAM TERPAKAI) ===']);
-                fputcsv($handle, ['Periode Laporan:', $data['periodeLabel']]);
+                fputcsv($handle, ['1. REKAPITULASI OKUPANSI PER FASILITAS (RESERVASI DISETUJUI & JAM TERPAKAI)']);
                 fputcsv($handle, [
                     'No',
                     'Nama Fasilitas',
-                    'Tipe Fasilitas',
+                    'Tipe',
                     'Lokasi',
-                    'Kapasitas (Orang)',
-                    'Status Fasilitas',
-                    'Jumlah Reservasi Disetujui',
-                    'Total Jam Terpakai (Jam)',
-                    'Total Menit Terpakai',
-                    'Rata-rata Durasi (Jam/Reservasi)',
+                    'Kapasitas',
+                    'Status',
+                    'Jml Disetujui',
+                    'Total Jam',
+                    'Rata-rata',
                 ]);
 
                 foreach ($data['occupancyData'] as $index => $row) {
@@ -106,32 +127,46 @@ class RekapController extends Controller
                         $row['facility']->nama,
                         ucfirst($row['facility']->tipe),
                         $row['facility']->lokasi,
-                        $row['facility']->kapasitas,
+                        $row['facility']->kapasitas.' org',
                         $row['facility']->status_label,
                         $row['approved_count'],
-                        $row['total_hours'],
-                        $row['total_minutes'],
-                        $row['avg_hours'],
+                        $row['total_hours'].' Jam',
+                        $row['avg_hours'] > 0 ? $row['avg_hours'].' Jam' : '—',
                     ]);
                 }
+
+                $overallAvg = $data['summary']['total_approved_reservations'] > 0
+                    ? round($data['summary']['total_hours_used'] / $data['summary']['total_approved_reservations'], 2)
+                    : 0;
+
+                fputcsv($handle, [
+                    'TOTAL:',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    $data['summary']['total_approved_reservations'],
+                    $data['summary']['total_hours_used'].' Jam',
+                    $overallAvg > 0 ? $overallAvg.' Jam' : '—',
+                ]);
                 fputcsv($handle, []);
             }
 
+            // 4. TABEL 2: Frekuensi Kerusakan per Fasilitas
             if ($type === 'damage_facility' || $type === 'all') {
-                fputcsv($handle, ['=== REKAP FREKUENSI KERUSAKAN PER FASILITAS ===']);
-                fputcsv($handle, ['Periode Laporan:', $data['periodeLabel']]);
+                fputcsv($handle, ['2. REKAPITULASI FREKUENSI KERUSAKAN PER FASILITAS']);
                 fputcsv($handle, [
                     'No',
                     'Nama Fasilitas',
-                    'Tipe Fasilitas',
+                    'Tipe',
                     'Lokasi',
-                    'Status Fasilitas',
-                    'Total Laporan Kerusakan',
-                    'Status: Baru',
-                    'Status: Diproses',
-                    'Status: Selesai',
-                    'Status: Ditolak',
-                    'Tingkat Penyelesaian (%)',
+                    'Total Laporan',
+                    'Baru',
+                    'Diproses',
+                    'Selesai',
+                    'Ditolak',
+                    '% Selesai',
                 ]);
 
                 foreach ($data['damageFacilityData'] as $index => $row) {
@@ -140,32 +175,44 @@ class RekapController extends Controller
                         $row['facility']->nama,
                         ucfirst($row['facility']->tipe),
                         $row['facility']->lokasi,
-                        $row['facility']->status_label,
                         $row['total_reports'],
                         $row['baru_count'],
                         $row['diproses_count'],
                         $row['selesai_count'],
                         $row['ditolak_count'],
-                        $row['resolution_rate'].'%',
+                        $row['total_reports'] > 0 ? $row['resolution_rate'].'%' : '—',
                     ]);
                 }
+
+                fputcsv($handle, [
+                    'TOTAL:',
+                    '',
+                    '',
+                    '',
+                    $data['summary']['total_reports'],
+                    $data['damageFacilityData']->sum('baru_count'),
+                    $data['damageFacilityData']->sum('diproses_count'),
+                    $data['damageFacilityData']->sum('selesai_count'),
+                    $data['damageFacilityData']->sum('ditolak_count'),
+                    $data['summary']['overall_resolution_rate'].'%',
+                ]);
                 fputcsv($handle, []);
             }
 
+            // 5. TABEL 3: Frekuensi Kerusakan per Lokasi
             if ($type === 'damage_location' || $type === 'all') {
-                fputcsv($handle, ['=== REKAP FREKUENSI KERUSAKAN PER LOKASI ===']);
-                fputcsv($handle, ['Periode Laporan:', $data['periodeLabel']]);
+                fputcsv($handle, ['3. REKAPITULASI FREKUENSI KERUSAKAN PER LOKASI']);
                 fputcsv($handle, [
                     'No',
-                    'Nama Lokasi',
-                    'Jumlah Fasilitas',
-                    'Daftar Fasilitas',
-                    'Total Laporan Kerusakan',
-                    'Laporan Baru',
-                    'Laporan Diproses',
-                    'Laporan Selesai',
-                    'Laporan Ditolak',
-                    'Total Belum Selesai (Baru + Diproses)',
+                    'Lokasi / Gedung',
+                    'Jml Fasilitas',
+                    'Fasilitas di Lokasi',
+                    'Total Laporan',
+                    'Baru',
+                    'Diproses',
+                    'Selesai',
+                    'Ditolak',
+                    'Belum Selesai',
                 ]);
 
                 foreach ($data['damageLocationData'] as $index => $row) {
@@ -173,7 +220,7 @@ class RekapController extends Controller
                         $index + 1,
                         $row['lokasi'],
                         $row['facilities_count'],
-                        $row['facility_names'],
+                        $row['facility_names'] ?: '—',
                         $row['total_reports'],
                         $row['baru_count'],
                         $row['diproses_count'],
@@ -182,11 +229,30 @@ class RekapController extends Controller
                         $row['pending_count'],
                     ]);
                 }
+
+                fputcsv($handle, [
+                    'TOTAL:',
+                    '',
+                    '',
+                    '',
+                    $data['summary']['total_reports'],
+                    $data['damageLocationData']->sum('baru_count'),
+                    $data['damageLocationData']->sum('diproses_count'),
+                    $data['damageLocationData']->sum('selesai_count'),
+                    $data['damageLocationData']->sum('ditolak_count'),
+                    $data['damageLocationData']->sum('pending_count'),
+                ]);
+                fputcsv($handle, []);
             }
+
+            // 6. Catatan Sistem & Pengesahan
+            fputcsv($handle, ['Catatan: Laporan ini digenerate secara otomatis oleh sistem FasilitasKita berdasarkan data transaksi reservasi dan laporan kerusakan yang telah tervalidasi.']);
+            fputcsv($handle, ['Dicetak pada: '.now()->translatedFormat('d F Y, H:i').' WIB oleh '.auth()->user()->name.' ('.auth()->user()->email.')']);
 
             fclose($handle);
         }, 200, $headers);
     }
+
 
     /**
      * Hitung dataset rekapitulasi okupansi dan frekuensi kerusakan.
