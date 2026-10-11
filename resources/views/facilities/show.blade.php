@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $facility->nama . ' - FasilitasKita')
+@section('title', $facility->nama . ' - SIREFA')
 
 @section('content')
 <div class="max-w-5xl mx-auto space-y-6">

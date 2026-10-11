@@ -87,8 +87,8 @@ class RekapController extends Controller
             fwrite($handle, "sep=,\r\n");
 
             // 1. Kop Laporan Resmi (Sama dengan Header PDF)
-            fputcsv($handle, ['FASILITASKITA', '', '', '', 'DOKUMEN RESMI REKAPITULASI']);
-            fputcsv($handle, ['Sistem Manajemen Fasilitas, Okupansi & Pelaporan Kerusakan', '', '', '', 'Dicetak: '.now()->translatedFormat('d F Y, H:i').' WIB']);
+            fputcsv($handle, ['SIREFA', '', '', '', 'DOKUMEN RESMI REKAPITULASI']);
+            fputcsv($handle, ['Sistem Reservasi dan Report Fasilitas Kampus', '', '', '', 'Dicetak: '.now()->translatedFormat('d F Y, H:i').' WIB']);
             fputcsv($handle, ['', '', '', '', 'Oleh: '.auth()->user()->name.' ('.ucfirst(auth()->user()->role).')']);
             fputcsv($handle, []);
             fputcsv($handle, ['LAPORAN REKAPITULASI PENGGUNAAN & KERUSAKAN FASILITAS']);
@@ -246,7 +246,7 @@ class RekapController extends Controller
             }
 
             // 6. Catatan Sistem & Pengesahan
-            fputcsv($handle, ['Catatan: Laporan ini digenerate secara otomatis oleh sistem FasilitasKita berdasarkan data transaksi reservasi dan laporan kerusakan yang telah tervalidasi.']);
+            fputcsv($handle, ['Catatan: Laporan ini digenerate secara otomatis oleh sistem SIREFA berdasarkan data transaksi reservasi dan laporan kerusakan yang telah tervalidasi.']);
             fputcsv($handle, ['Dicetak pada: '.now()->translatedFormat('d F Y, H:i').' WIB oleh '.auth()->user()->name.' ('.auth()->user()->email.')']);
 
             fclose($handle);

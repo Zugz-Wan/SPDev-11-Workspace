@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Akun Baru - FasilitasKita')
+@section('title', 'Daftar Akun Baru - SIREFA')
 
 @section('content')
 <div class="max-w-md mx-auto my-6 sm:my-8 space-y-6">

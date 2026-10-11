@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@hasSection('title')@yield('title') - {{ config('app.name') }}@else{{ $title ?? 'Sistem Manajemen Fasilitas & Pelaporan Kerusakan' }} - {{ config('app.name') }}@endif</title>
+    <title>@hasSection('title')@yield('title') - SIREFA@else{{ $title ?? 'SIREFA - Sistem Reservasi dan Report Fasilitas' }}@endif</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -28,8 +28,8 @@
                             </svg>
                         </div>
                         <div>
-                            <span class="font-bold text-slate-900 tracking-tight text-base sm:text-lg block leading-tight">FasilitasKita</span>
-                            <span class="text-xs text-slate-500 font-medium hidden sm:block">Pelaporan & Monitoring Fasilitas</span>
+                            <span class="font-bold text-slate-900 tracking-tight text-base sm:text-lg block leading-tight">SIREFA</span>
+                            <span class="text-xs text-slate-500 font-medium hidden sm:block">Sistem Reservasi & Report Fasilitas</span>
                         </div>
                     </a>
 
@@ -216,7 +216,7 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 mt-auto py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-            <p>&copy; {{ date('Y') }} FasilitasKita - Sistem Manajemen Fasilitas & Pelaporan Kerusakan Kampus.</p>
+            <p>&copy; {{ date('Y') }} SIREFA - Sistem Reservasi dan Report Fasilitas Kampus.</p>
             <div class="flex items-center space-x-4">
                 <span class="inline-flex items-center text-emerald-600">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>

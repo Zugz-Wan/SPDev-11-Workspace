@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laporan Rekapitulasi Fasilitas - FasilitasKita</title>
+    <title>Laporan Rekapitulasi Fasilitas - SIREFA</title>
 
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -83,11 +83,11 @@
             <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center font-extrabold text-xl">
-                        FK
+                        SR
                     </div>
                     <div>
-                        <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">FASILITASKITA</h1>
-                        <p class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Sistem Manajemen Fasilitas, Okupansi & Pelaporan Kerusakan</p>
+                        <h1 class="text-xl font-black text-slate-900 tracking-tight uppercase">SIREFA</h1>
+                        <p class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Sistem Reservasi dan Report Fasilitas</p>
                     </div>
                 </div>
                 <div class="text-right text-xs text-slate-500">
@@ -295,13 +295,13 @@
             <div>
                 <p class="text-slate-500">Catatan Sistem:</p>
                 <p class="text-slate-600 mt-1 italic text-[11px]">
-                    Laporan ini digenerate secara otomatis oleh sistem FasilitasKita berdasarkan data transaksi reservasi dan laporan kerusakan yang telah tervalidasi.
+                    Laporan ini digenerate secara otomatis oleh sistem SIREFA berdasarkan data transaksi reservasi dan laporan kerusakan yang telah tervalidasi.
                 </p>
             </div>
             <div class="text-center ml-auto w-64 space-y-12">
                 <div>
-                    <p class="text-slate-600">Dicetak pada {{ $printedAt->translatedFormat('d F Y') }}</p>
-                    <p class="font-bold text-slate-900">Administrator FasilitasKita</p>
+                    <p class="text-slate-600"><span class="block">Dicetak pada {{ $printedAt->translatedFormat('d F Y') }}</span></p>
+                    <p class="font-bold text-slate-900">Administrator SIREFA</p>
                 </div>
                 <div>
                     <p class="font-bold text-slate-900 underline">{{ $printedBy->name }}</p>

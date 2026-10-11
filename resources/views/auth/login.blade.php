@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Masuk - FasilitasKita')
+@section('title', 'Masuk - SIREFA')
 
 @section('content')
 <div class="max-w-md mx-auto my-8 sm:my-12 space-y-6">
