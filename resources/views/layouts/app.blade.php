@@ -57,7 +57,7 @@
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                     </svg>
-                                    <span>+ Lapor Kerusakan</span>
+                                    <span>Lapor Kerusakan</span>
                                 </a>
                             @endif
 
@@ -72,7 +72,7 @@
                                 </a>
                                 <a href="{{ route('reports.create') }}"
                                    class="ml-1 inline-flex items-center space-x-1 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-200 transition-all hover:scale-105">
-                                    <span>+ Input Laporan</span>
+                                    <span>Input Laporan</span>
                                 </a>
                             @endif
 
@@ -99,7 +99,7 @@
                                 </a>
                                 <a href="{{ route('reports.create') }}"
                                    class="ml-1 inline-flex items-center space-x-1 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-200 transition-all hover:scale-105">
-                                    <span>+ Input Laporan</span>
+                                    <span>Input Laporan</span>
                                 </a>
                             @endif
                         @endauth
@@ -151,17 +151,17 @@
             <a href="{{ route('facilities.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('facilities.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Fasilitas</a>
             @auth
                 @if(auth()->user()->isPengguna())
-                    <a href="{{ route('reports.create') }}" class="px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap bg-rose-600 text-white shadow-sm">+ Lapor Kerusakan</a>
+                    <a href="{{ route('reports.create') }}" class="px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap bg-rose-600 text-white shadow-sm">Lapor Kerusakan</a>
                     <a href="{{ route('reservations.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('reservations.*') ? 'bg-slate-800 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Reservasi Saya</a>
                     <a href="{{ route('reports.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('reports.index') ? 'bg-slate-800 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Laporan Saya</a>
                 @endif
                 @if(auth()->user()->isPetugas() && !auth()->user()->isAdmin())
-                    <a href="{{ route('reports.create') }}" class="px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap bg-rose-600 text-white shadow-sm">+ Lapor</a>
+                    <a href="{{ route('reports.create') }}" class="px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap bg-rose-600 text-white shadow-sm">Lapor</a>
                     <a href="{{ route('officer.reports.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('officer.reports.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Antrian Laporan</a>
                     <a href="{{ route('petugas.reservations.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('petugas.reservations.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Antrian Reservasi</a>
                 @endif
                 @if(auth()->user()->isAdmin())
-                    <a href="{{ route('reports.create') }}" class="px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap bg-rose-600 text-white shadow-sm">+ Lapor</a>
+                    <a href="{{ route('reports.create') }}" class="px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap bg-rose-600 text-white shadow-sm">Lapor</a>
                     <a href="{{ route('admin.facilities.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.facilities.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Kelola Fasilitas</a>
                     <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.users.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Kelola Pengguna</a>
                     <a href="{{ route('admin.rekap.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.rekap.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Rekap & Ekspor</a>
