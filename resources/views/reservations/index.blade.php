@@ -95,7 +95,7 @@
                     <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
                         <span class="text-[11px] text-slate-400">Diajukan {{ $res->created_at->diffForHumans() }}</span>
 
-                        @if($res->status === 'pending' || $res->status === 'disetujui')
+                        @if(($res->status === 'pending' || $res->status === 'disetujui') && $res->canBeCancelled())
                             <form method="POST" action="{{ route('reservations.destroy', $res->id) }}"
                                   onsubmit="return confirm('Apakah Anda yakin ingin membatalkan permohonan reservasi ini?');">
                                 @csrf
@@ -104,6 +104,10 @@
                                     Batalkan Reservasi
                                 </button>
                             </form>
+                        @elseif($res->status === 'pending' || $res->status === 'disetujui')
+                            <span class="text-slate-400 text-xs italic" title="Pembatalan ditutup karena waktu mulai kurang dari 2 jam dari sekarang atau sudah lewat">
+                                Batas pembatalan lewat (&lt; 2 jam)
+                            </span>
                         @else
                             <span class="text-slate-400 text-xs">-</span>
                         @endif

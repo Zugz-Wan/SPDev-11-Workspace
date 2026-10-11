@@ -512,4 +512,33 @@ class ReservationTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['start_time']);
     }
+
+    public function test_store_fails_when_date_is_in_the_past(): void
+    {
+        $this->travelTo(now()->setTime(10, 0, 0));
+
+        $response = $this->actingAs($this->user)->postJson('/reservations', [
+            'facility_id' => $this->facility->id,
+            'tanggal' => now()->subDay()->format('Y-m-d'),
+            'start_time' => '10:00',
+            'end_time' => '11:00',
+            'keperluan' => 'Sesi Belajar Kemarin',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['tanggal']);
+    }
+
+    public function test_facility_show_marks_past_slots_as_not_available_today(): void
+    {
+        $this->travelTo(now()->setTime(11, 15, 0));
+
+        $response = $this->actingAs($this->user)->get(route('facilities.show', [
+            'id' => $this->facility->id,
+            'date' => now()->format('Y-m-d'),
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertSee('Lewat');
+    }
 }

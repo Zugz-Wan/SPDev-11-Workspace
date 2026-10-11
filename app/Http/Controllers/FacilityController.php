@@ -94,6 +94,10 @@ class FacilityController extends Controller
             $selectedDate = now()->format('Y-m-d');
         }
 
+        if ($selectedDate < now()->format('Y-m-d')) {
+            $selectedDate = now()->format('Y-m-d');
+        }
+
         $approvedReservations = Reservation::where('facility_id', $facility->id)
             ->where('tanggal', $selectedDate)
             ->where('status', 'disetujui')
@@ -102,6 +106,8 @@ class FacilityController extends Controller
         $slots = [];
         $current = Carbon::createFromFormat('H:i', '07:00');
         $endDay = Carbon::createFromFormat('H:i', '20:00');
+        $isToday = $selectedDate === now()->format('Y-m-d');
+        $currentTime = now()->format('H:i');
 
         while ($current->lt($endDay)) {
             $slotStart = $current->format('H:i');
@@ -114,11 +120,14 @@ class FacilityController extends Controller
                 return $resStart < $slotEnd && $resEnd > $slotStart;
             });
 
+            $isPast = $isToday && ($slotStart <= $currentTime);
+
             $slots[] = [
                 'start' => $slotStart,
                 'end' => $slotEnd,
-                'available' => ! $isOccupied,
+                'available' => ! $isOccupied && ! $isPast,
                 'is_booked' => $isOccupied,
+                'is_past' => $isPast,
             ];
 
             $current->addMinutes(30);

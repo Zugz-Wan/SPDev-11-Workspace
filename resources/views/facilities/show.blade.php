@@ -106,16 +106,19 @@
                     <div class="p-2.5 rounded-xl border flex items-center justify-between
                         @if($facility->status === 'perbaikan') bg-amber-50/60 border-amber-200 text-amber-800
                         @elseif($slot['is_booked']) bg-rose-50 border-rose-200 text-rose-800
+                        @elseif(!empty($slot['is_past'])) bg-slate-100 border-slate-200 text-slate-400
                         @else bg-emerald-50/70 border-emerald-200 text-emerald-800
                         @endif">
                         <span class="font-mono font-medium">{{ $slot['start'] }} - {{ $slot['end'] }}</span>
                         <span class="text-[10px] font-bold px-1.5 py-0.5 rounded
                             @if($facility->status === 'perbaikan') bg-amber-100 text-amber-800
                             @elseif($slot['is_booked']) bg-rose-100 text-rose-700
+                            @elseif(!empty($slot['is_past'])) bg-slate-200 text-slate-500
                             @else bg-emerald-100 text-emerald-700
                             @endif">
                             @if($facility->status === 'perbaikan') Perbaikan
                             @elseif($slot['is_booked']) Terisi
+                            @elseif(!empty($slot['is_past'])) Lewat
                             @else Tersedia
                             @endif
                         </span>
@@ -124,9 +127,10 @@
             </div>
 
             <!-- Legend -->
-            <div class="flex items-center space-x-4 pt-2 text-[11px] text-slate-500">
+            <div class="flex flex-wrap items-center gap-4 pt-2 text-[11px] text-slate-500">
                 <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded bg-emerald-400 mr-1.5"></span> Tersedia</span>
                 <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded bg-rose-400 mr-1.5"></span> Terisi / Disetujui</span>
+                <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded bg-slate-300 mr-1.5"></span> Sudah Lewat</span>
                 <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded bg-amber-400 mr-1.5"></span> Dalam Perbaikan</span>
             </div>
         </div>
@@ -135,7 +139,7 @@
         <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
             <div>
                 <h2 class="text-base font-bold text-slate-900">Ajukan Reservasi</h2>
-                <p class="text-[11px] text-slate-500">Pilih rentang slot waktu dan lengkapi rincian kegiatan Anda.</p>
+                <p class="text-[11px] text-slate-500">Pilih rentang slot waktu dan lengkapi rincian kegiatan Anda (Waktu Indonesia Barat / UTC+7).</p>
             </div>
 
             @auth
@@ -151,7 +155,7 @@
 
                             <div>
                                 <label for="tanggal" class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Penggunaan</label>
-                                <input type="date" id="tanggal" name="tanggal" value="{{ old('tanggal', $selectedDate) }}" min="{{ date('Y-m-d') }}" required
+                                <input type="date" id="tanggal" name="tanggal" value="{{ old('tanggal', $selectedDate) }}" min="{{ now()->format('Y-m-d') }}" required
                                        class="w-full text-xs rounded-xl border border-slate-300 px-3.5 py-2.5 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
                                 @error('tanggal')
                                     <p class="text-xs text-rose-600 mt-1">{{ $message }}</p>
@@ -166,7 +170,12 @@
                                         <option value="">Pilih</option>
                                         @foreach($timeOptions as $t)
                                             @if($t !== '20:00')
-                                                <option value="{{ $t }}" {{ old('start_time') === $t ? 'selected' : '' }}>{{ $t }}</option>
+                                                @php
+                                                    $isPastTime = ($selectedDate === now()->format('Y-m-d')) && ($t <= now()->format('H:i'));
+                                                @endphp
+                                                <option value="{{ $t }}" data-time="{{ $t }}" {{ old('start_time') === $t ? 'selected' : '' }} {{ $isPastTime ? 'disabled' : '' }}>
+                                                    {{ $t }}{{ $isPastTime ? ' (Lewat)' : '' }}
+                                                </option>
                                             @endif
                                         @endforeach
                                     </select>
@@ -223,4 +232,40 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tanggalInput = document.getElementById('tanggal');
+        const startTimeSelect = document.getElementById('start_time');
+        const todayStr = '{{ now()->format("Y-m-d") }}';
+        const currentTimeStr = '{{ now()->format("H:i") }}';
+
+        function updateAvailableTimes() {
+            if (!tanggalInput || !startTimeSelect) return;
+            const isToday = tanggalInput.value === todayStr;
+
+            Array.from(startTimeSelect.options).forEach(opt => {
+                if (!opt.value) return;
+                const optTime = opt.getAttribute('data-time') || opt.value;
+                if (isToday && optTime <= currentTimeStr) {
+                    opt.disabled = true;
+                    if (!opt.text.includes('(Lewat)')) {
+                        opt.text = optTime + ' (Lewat)';
+                    }
+                    if (startTimeSelect.value === optTime) {
+                        startTimeSelect.value = '';
+                    }
+                } else {
+                    opt.disabled = false;
+                    opt.text = optTime;
+                }
+            });
+        }
+
+        if (tanggalInput) {
+            tanggalInput.addEventListener('change', updateAvailableTimes);
+            updateAvailableTimes();
+        }
+    });
+</script>
 @endsection
