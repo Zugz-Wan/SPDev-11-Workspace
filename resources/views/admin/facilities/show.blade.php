@@ -38,14 +38,25 @@
            class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
             Edit
         </a>
-        <form method="POST" action="{{ route('admin.facilities.destroy', $facility->id) }}"
-              onsubmit="return confirm('Yakin ingin menonaktifkan fasilitas ini?')">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                Nonaktifkan
-            </button>
-        </form>
+        @if($facility->status === 'tidak_aktif')
+            <form method="POST" action="{{ route('admin.facilities.destroy', $facility->id) }}"
+                  onsubmit="return confirm('Yakin ingin mengaktifkan fasilitas ini?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Aktifkan
+                </button>
+            </form>
+        @else
+            <form method="POST" action="{{ route('admin.facilities.destroy', $facility->id) }}"
+                  onsubmit="return confirm('Yakin ingin menonaktifkan fasilitas ini?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    Nonaktifkan
+                </button>
+            </form>
+        @endif
     </div>
 </div>
 @endsection

@@ -49,13 +49,23 @@
                                class="text-blue-600 hover:underline">Lihat</a>
                             <a href="{{ route('admin.facilities.edit', $facility->id) }}"
                                class="text-yellow-600 hover:underline ml-3">Edit</a>
-                            <form method="POST" action="{{ route('admin.facilities.destroy', $facility->id) }}"
-                                  class="inline ml-3"
-                                  onsubmit="return confirm('Yakin ingin menonaktifkan fasilitas ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:underline">Nonaktifkan</button>
-                            </form>
+                            @if($facility->status === 'tidak_aktif')
+                                <form method="POST" action="{{ route('admin.facilities.destroy', $facility->id) }}"
+                                      class="inline ml-3"
+                                      onsubmit="return confirm('Yakin ingin mengaktifkan fasilitas ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-green-600 hover:underline">Aktifkan</button>
+                                </form>
+                            @else
+                                <form method="POST" action="{{ route('admin.facilities.destroy', $facility->id) }}"
+                                      class="inline ml-3"
+                                      onsubmit="return confirm('Yakin ingin menonaktifkan fasilitas ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:underline">Nonaktifkan</button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

@@ -73,6 +73,14 @@ class FacilityController extends Controller
     public function destroy(string $id)
     {
         $facility = Facility::findOrFail($id);
+
+        if ($facility->status === 'tidak_aktif') {
+            $facility->update(['status' => 'tersedia']);
+
+            return redirect()->route('admin.facilities.index')
+                ->with('success', 'Fasilitas diaktifkan.');
+        }
+
         $facility->update(['status' => 'tidak_aktif']);
 
         return redirect()->route('admin.facilities.index')
