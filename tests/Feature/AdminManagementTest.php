@@ -102,6 +102,21 @@ class AdminManagementTest extends TestCase
         $response->assertSessionHasErrors('email');
     }
 
+    public function test_admin_cannot_create_user_with_admin_role(): void
+    {
+        $response = $this->actingAs($this->admin)->post(route('admin.users.store'), [
+            'name' => 'Admin Baru',
+            'email' => 'admin.baru@kampus.test',
+            'password' => 'password123',
+            'role' => 'admin',
+        ]);
+
+        $response->assertSessionHasErrors('role');
+        $this->assertDatabaseMissing('users', [
+            'email' => 'admin.baru@kampus.test',
+        ]);
+    }
+
     public function test_admin_can_view_recap_and_export_csv(): void
     {
         $facility = Facility::create([
@@ -112,11 +127,11 @@ class AdminManagementTest extends TestCase
             'status' => 'tersedia',
         ]);
 
-        $response = $this->actingAs($this->admin)->get(route('admin.recap.index'));
+        $response = $this->actingAs($this->admin)->get(route('admin.rekap.index'));
         $response->assertStatus(200);
 
-        $exportResponse = $this->actingAs($this->admin)->get(route('admin.recap.export'));
+        $exportResponse = $this->actingAs($this->admin)->get(route('admin.rekap.export.csv'));
         $exportResponse->assertStatus(200);
-        $this->assertTrue(str_contains($exportResponse->headers->get('content-disposition'), 'attachment; filename="rekap_fasilitas_kampus_'));
+        $this->assertTrue(str_contains($exportResponse->headers->get('content-disposition'), 'attachment; filename="rekap-'));
     }
 }

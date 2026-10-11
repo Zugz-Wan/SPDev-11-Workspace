@@ -85,8 +85,8 @@
                                    class="px-3 py-2 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                     Kelola Pengguna
                                 </a>
-                                <a href="{{ route('admin.recap.index') }}"
-                                   class="px-3 py-2 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('admin.recap.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
+                                <a href="{{ route('admin.rekap.index') }}"
+                                   class="px-3 py-2 rounded-lg text-xs font-semibold transition-colors {{ request()->routeIs('admin.rekap.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }}">
                                     Rekap & Ekspor
                                 </a>
                                 <a href="{{ route('officer.reports.index') }}"
@@ -164,7 +164,7 @@
                     <a href="{{ route('reports.create') }}" class="px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap bg-rose-600 text-white shadow-sm">+ Lapor</a>
                     <a href="{{ route('admin.facilities.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.facilities.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Kelola Fasilitas</a>
                     <a href="{{ route('admin.users.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.users.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Kelola Pengguna</a>
-                    <a href="{{ route('admin.recap.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.recap.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Rekap & Ekspor</a>
+                    <a href="{{ route('admin.rekap.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('admin.rekap.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Rekap & Ekspor</a>
                     <a href="{{ route('officer.reports.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('officer.reports.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Laporan</a>
                     <a href="{{ route('petugas.reservations.index') }}" class="px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap {{ request()->routeIs('petugas.reservations.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 bg-white border border-slate-200' }}">Reservasi</a>
                 @endif

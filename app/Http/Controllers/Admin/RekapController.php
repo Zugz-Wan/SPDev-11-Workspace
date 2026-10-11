@@ -131,7 +131,7 @@ class RekapController extends Controller
                         $row['facility']->status_label,
                         $row['approved_count'],
                         $row['total_hours'].' Jam',
-                        $row['avg_hours'] > 0 ? $row['avg_hours'].' Jam' : '—',
+                        $row['avg_hours'] > 0 ? $row['avg_hours'].' Jam' : '-',
                     ]);
                 }
 
@@ -148,7 +148,7 @@ class RekapController extends Controller
                     '',
                     $data['summary']['total_approved_reservations'],
                     $data['summary']['total_hours_used'].' Jam',
-                    $overallAvg > 0 ? $overallAvg.' Jam' : '—',
+                    $overallAvg > 0 ? $overallAvg.' Jam' : '-',
                 ]);
                 fputcsv($handle, []);
             }
@@ -180,7 +180,7 @@ class RekapController extends Controller
                         $row['diproses_count'],
                         $row['selesai_count'],
                         $row['ditolak_count'],
-                        $row['total_reports'] > 0 ? $row['resolution_rate'].'%' : '—',
+                        $row['total_reports'] > 0 ? $row['resolution_rate'].'%' : '-',
                     ]);
                 }
 
@@ -220,7 +220,7 @@ class RekapController extends Controller
                         $index + 1,
                         $row['lokasi'],
                         $row['facilities_count'],
-                        $row['facility_names'] ?: '—',
+                        $row['facility_names'] ?: '-',
                         $row['total_reports'],
                         $row['baru_count'],
                         $row['diproses_count'],

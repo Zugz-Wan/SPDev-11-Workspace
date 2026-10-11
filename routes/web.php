@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\RecapController;
 use App\Http\Controllers\Admin\RekapController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
@@ -93,6 +92,4 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/rekap', [RekapController::class, 'index'])->name('rekap.index');
     Route::get('/rekap/export/csv', [RekapController::class, 'exportCsv'])->name('rekap.export.csv');
     Route::get('/rekap/print', [RekapController::class, 'print'])->name('rekap.print');
-    Route::get('/recap', [RecapController::class, 'index'])->name('recap.index');
-    Route::get('/recap/export', [RecapController::class, 'exportCsv'])->name('recap.export');
 });
